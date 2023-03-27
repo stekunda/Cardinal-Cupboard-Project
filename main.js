@@ -1,29 +1,27 @@
-/*const http = require("http");
-const fs = require("fs");
+function setFormMessage(formElement, type, message) {
+    const messageElement = formElement.querySelector(".form__message");
 
-const port = 3000;
+    messageElement.textContent = message;
+    messageElement.classList.remove(
+        "form__message--success",
+        "form__message--error"
+    );
+    messageElement.classList.add(`form__message--${type}`);
+}
 
-const server = http.createServer(function (req, res) {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    fs.readFile("index.html", function (error, data) {
-        if (error) {
-            res.writeHead(404);
-            res.write("Error: File Not Found");
-        } else {
-            res.write(data);
-        }
-        res.end();
-    });
-});
+function setInputError(inputElement, message) {
+    inputElement.classList.add("form__input--error");
+    inputElement.parentElement.querySelector(
+        ".form__input-error-message"
+    ).textContent = message;
+}
 
-server.listen(port, function (error) {
-    if (error) {
-        console.log("Something went wrong", error);
-    } else {
-        console.log("Server is listening on port " + port);
-    }
-});
-*/
+function clearInputError(inputElement) {
+    inputElement.classList.remove("form__input--error");
+    inputElement.parentElement.querySelector(
+        ".form__input-error-message"
+    ).textContent = "";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector("#login");
@@ -41,5 +39,36 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         loginForm.classList.remove("form--hidden");
         createAccountForm.classList.add("form--hidden");
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        // Perform your AJAX/Fetch login
+
+        setFormMessage(
+            loginForm,
+            "error",
+            "Invalid username/password combination"
+        );
+    });
+
+    document.querySelectorAll(".form__input").forEach((inputElement) => {
+        inputElement.addEventListener("blur", (e) => {
+            if (
+                e.target.id === "signupUsername" &&
+                e.target.value.length > 0 &&
+                e.target.value.length < 10
+            ) {
+                setInputError(
+                    inputElement,
+                    "Username must be at least 10 characters in length"
+                );
+            }
+        });
+
+        inputElement.addEventListener("input", (e) => {
+            clearInputError(inputElement);
+        });
     });
 });
