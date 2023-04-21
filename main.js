@@ -1,3 +1,7 @@
+async function timeout(miliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, miliseconds));
+}
+
 function setFormMessage(formElement, type, message) {
     const messageElement = formElement.querySelector(".form__message");
 
@@ -17,7 +21,7 @@ function setInputError(inputElement, message) {
 }
 
 function clearInputError(inputElement) {
-    inputElement.classList.remove("form__input--error");
+    inputElement.classList.remove("form__i nput--error");
     inputElement.parentElement.querySelector(
         ".form__input-error-message"
     ).textContent = "";
@@ -26,7 +30,9 @@ function clearInputError(inputElement) {
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector("#login");
     const createAccountForm = document.querySelector("#createAccount");
+    const calendar = document.querySelector("#calendar");
 
+    // When "Don't have an account? Create Account" is clicked, show Create Account form
     document
         .querySelector("#linkCreateAccount")
         .addEventListener("click", (e) => {
@@ -35,24 +41,67 @@ document.addEventListener("DOMContentLoaded", () => {
             createAccountForm.classList.remove("form--hidden");
         });
 
+    // When "Already have an acoount? Sign in" is clicked, show Login form
     document.querySelector("#linkLogin").addEventListener("click", (e) => {
         e.preventDefault();
         loginForm.classList.remove("form--hidden");
         createAccountForm.classList.add("form--hidden");
     });
+    //
+    //
+    //
+    //
+    //
 
-    loginForm.addEventListener("submit", (e) => {
+    const loginUser = document.getElementById("loginUser");
+    const password = document.getElementById("loginPassword");
+    const username = document.getElementById("loginUsername");
+    const addUser = document.getElementById("addUser");
+
+    const baseUrl = "http://localhost:8000/holler";
+
+    loginUser.addEventListener("click", postInfo);
+    addUser.addEventListener("click", registerUser);
+
+    async function registerUser(e) {
         e.preventDefault();
+        await timeout(1000);
+        window.location = "../calendarTools/calendar.html";
+    }
 
-        // Perform your AJAX/Fetch login
+    async function postInfo(e) {
+        e.preventDefault();
+        console.log(password);
+        if (password.value == "" && username.value == "") {
+            return;
+        }
+        const res = await fetch(baseUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                parcel: username.value + "\n" + password.value,
+            }),
+        });
+        if (res.status == 200) {
+            await timeout(1000);
+            window.location = "../calendarTools/calendar.html";
+        } else {
+            await timeout(1000);
+            setFormMessage(
+                loginForm,
+                "error",
+                "Invalid username/password combination"
+            );
+        }
+    }
 
-        setFormMessage(
-            loginForm,
-            "error",
-            "Invalid username/password combination"
-        );
-    });
-
+    //
+    //
+    //
+    //
+    //
     document.querySelectorAll(".form__input").forEach((inputElement) => {
         inputElement.addEventListener("blur", (e) => {
             if (
